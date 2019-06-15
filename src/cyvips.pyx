@@ -1,0 +1,10 @@
+# https://stackoverflow.com/a/11804020/10952119
+include "decls.pxd"
+include "utils.pyx"
+include "error.pyx"
+include "__init__.pyx"
+include "vimage.pyx"
+include "voperation.pyx"
+include "vobject.pyx"
+include "gobject.pyx"
+include "gvalue.pyx"
