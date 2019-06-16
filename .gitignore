@@ -12,6 +12,7 @@ __pycache__
 build/
 dist/
 cython_debug/
+tmp/
 *.patch
 *.diff
 *.orig
@@ -23,7 +24,7 @@ cython_debug/
 *~
 
 src/*.c
-operation-call-*.json
+*.json
 
 # Jetbrains IDE project files
 .idea/

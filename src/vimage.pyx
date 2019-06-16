@@ -79,6 +79,70 @@ class Image():
 
         return image
 
+    @staticmethod
+    def new_from_file(vips_filename, **kwargs):
+        """Load an image from a file.
+
+        This method can load images in any format supported by vips. The
+        filename can include load options, for example::
+
+            image = cyvips.Image.new_from_file('fred.jpg[shrink=2]')
+
+        You can also supply options as keyword arguments, for example::
+
+            image = cyvips.Image.new_from_file('fred.jpg', shrink=2)
+
+        The full set of options available depend upon the load operation that
+        will be executed. Try something like::
+
+            $ vips jpegload
+
+        at the command-line to see a summary of the available options for the
+        JPEG loader.
+
+        Loading is fast: only enough of the image is loaded to be able to fill
+        out the header. Pixels will only be decompressed when they are needed.
+
+        Args:
+            vips_filename (str): The disc file to load the image from, with
+                optional appended arguments.
+
+        All loaders support at least the following options:
+
+        Keyword args:
+            memory (bool): If set True, load the image via memory rather than
+                via a temporary disc file. See :meth:`.new_temp_file` for
+                notes on where temporary files are created. Small images are
+                loaded via memory by default, use ``VIPS_DISC_THRESHOLD`` to
+                set the definition of small.
+            access (Access): Hint the expected access pattern for the image.
+            fail (bool): If set True, the loader will fail with an error on
+                the first serious error in the file. By default, libvips
+                will attempt to read everything it can from a damaged image.
+
+        Returns:
+            A new :class:`.Image`.
+
+        Raises:
+            :class:`.Error`
+
+        """
+        vips_filename = to_bytes(vips_filename)
+        pointer = vips_filename_get_filename(vips_filename)
+        filename = to_unicode_free(pointer)
+
+        pointer = vips_filename_get_options(vips_filename)
+        options = to_unicode_free(pointer)
+
+        cdef const char *loader = vips_foreign_find_load(vips_filename)
+        if loader is NULL:
+            raise VipsError('unable to load from file {0}'.format(vips_filename))
+        name = to_unicode(loader)
+
+        kwargs['string_options'] = options
+
+        return COperation.call(name, None, (filename,), kwargs)
+
 cdef class CImage(CVipsObject):
     """Wrap a VipsImage object.
 
@@ -146,6 +210,71 @@ cdef class CImage(CVipsObject):
             raise VipsError('unable to copy to memory')
 
         return CImage.new(vi)
+
+    # writers
+
+    def write_to_file(self, vips_filename, **kwargs):
+        """Write an image to a file on disc.
+
+        This method can save images in any format supported by vips. The format
+        is selected from the filename suffix. The filename can include embedded
+        save options, see :func:`Image.new_from_file`.
+
+        For example::
+
+            image.write_to_file('fred.jpg[Q=95]')
+
+        You can also supply options as keyword arguments, for example::
+
+            image.write_to_file('fred.jpg', Q=95)
+
+        The full set of options available depend upon the load operation that
+        will be executed. Try something like::
+
+            $ vips jpegsave
+
+        at the command-line to see a summary of the available options for the
+        JPEG saver.
+
+        Args:
+            vips_filename (str): The disc file to save the image to, with
+                optional appended arguments.
+
+        Other arguments depend upon the save operation.
+
+        Returns:
+            None
+
+        Raises:
+            :class:`.Error`
+
+        """
+        vips_filename = to_bytes(vips_filename)
+        pointer = vips_filename_get_filename(vips_filename)
+        filename = to_unicode_free(pointer)
+
+        pointer = vips_filename_get_options(vips_filename)
+        options = to_unicode_free(pointer)
+
+        cdef const char *saver = vips_foreign_find_save(vips_filename)
+        if saver is NULL:
+            raise VipsError('unable to write to file {0}'.format(vips_filename))
+        name = to_unicode(saver)
+
+        kwargs['string_options'] = options
+
+        return COperation.call(name, self, (filename,), kwargs)
+
+    def set_progress(self, progress):
+        """Enable progress reporting on an image.
+
+        When progress reporting is enabled, evaluation of the most downstream
+        image from this image will report progress using the ::preeval, ::eval,
+        and ::posteval signals.
+
+        """
+
+        vips_image_set_progress(<VipsImage *> self.pointer, progress)
 
     def get_typeof(self, name):
         """Get the GType of an item of metadata.

@@ -9,7 +9,8 @@ if vips_init(to_bytes(sys.argv[0])) != 0:
 
 cdef void log_handler_callback(const char *domain, int log_level, const char *message,
                                void *user_data) nogil:
-    printf("%s (%d): %s\n", domain, log_level, message)
+    pass
+    # printf("%s (%d): %s\n", domain, log_level, message)
 
 _log_handler_id = g_log_set_handler('VIPS',
                                     GLogLevelFlags.G_LOG_LEVEL_DEBUG |
@@ -20,7 +21,7 @@ _log_handler_id = g_log_set_handler('VIPS',
                                     GLogLevelFlags.G_LOG_LEVEL_ERROR |
                                     GLogLevelFlags.G_LOG_FLAG_FATAL |
                                     GLogLevelFlags.G_LOG_FLAG_RECURSION,
-                                    <GLogFunc> log_handler_callback, NULL)
+                                    <GLogFunc> &log_handler_callback, NULL)
 
 cdef void on_stdlib_atexit() nogil:
     global _log_handler_id
