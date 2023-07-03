@@ -115,7 +115,7 @@ cdef class CGValue:
         g_value_init(self.pointer, gtype)
 
     @staticmethod
-    cdef int _vips_blob_free(void *buf, void *area) nogil:
+    cdef int _vips_blob_free(void *buf, void *area) noexcept nogil:
         g_free(buf)
 
         return 0
