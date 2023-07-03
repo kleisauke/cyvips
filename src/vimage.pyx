@@ -1,4 +1,4 @@
-# https://stackoverflow.com/a/22409540/1480019
+# https://stackoverflow.com/a/22409540
 def _with_metaclass(mcls):
     def decorator(cls):
         body = vars(cls).copy()

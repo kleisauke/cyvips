@@ -21,6 +21,11 @@ cyvips_classifiers = [
     'Programming Language :: Python :: 3.4',
     'Programming Language :: Python :: 3.5',
     'Programming Language :: Python :: 3.6',
+    'Programming Language :: Python :: 3.7',
+    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
     'Programming Language :: Cython',
     'Programming Language :: Python :: Implementation :: PyPy',
     'Programming Language :: Python :: Implementation :: CPython',
@@ -51,19 +56,19 @@ vips_library_dirs = vips_pc['library_dirs']
 vips_include_dirs = vips_pc['include_dirs']
 
 ext_modules = [
-    Extension("cyvips",
-              sources=["src/cyvips.pyx"],
+    Extension('cyvips',
+              sources=['src/cyvips.pyx'],
               libraries=vips_libs,
-              extra_compile_args=["-O3", "-ffast-math"],
-              # extra_compile_args=["-g"],
-              # extra_link_args=["-g"],
+              extra_compile_args=['-O3'],
+              # extra_compile_args=['-g'],
+              # extra_link_args=['-g'],
               library_dirs=vips_library_dirs,
               include_dirs=['src/'] + vips_include_dirs, )
 ]
 
 pyvips_packages = find_packages(exclude=['docs', 'tests', 'examples'])
 
-setup(name="cyvips",
+setup(name='cyvips',
       version='0.0.1',
       description='binding for the libvips image processing library using Cython',
       url='https://github.com/kleisauke/cyvips',

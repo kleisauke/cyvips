@@ -1,4 +1,4 @@
-# https://stackoverflow.com/a/11804020/10952119
+# https://stackoverflow.com/a/11804020
 include "decls.pxd"
 include "utils.pyx"
 include "error.pyx"
